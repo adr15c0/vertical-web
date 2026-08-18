@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Client-side stopgap: block direct pushes to main (use a PR instead).
+# Enable once per clone:  git config core.hooksPath scripts/git-hooks
+# This is a local safeguard only (bypassable); server-side protection needs a
+# public repo or GitHub Pro/Team.
+set -euo pipefail
+
+protected="main"
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+  if [[ "$remote_ref" == "refs/heads/$protected" ]]; then
+    echo "✋ Direct pushes to '$protected' are not allowed. Open a PR:"
+    echo "   git switch -c feat/your-change && git push -u origin feat/your-change"
+    exit 1
+  fi
+done
+exit 0

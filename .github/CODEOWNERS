@@ -1,0 +1,10 @@
+# Default owner for everything in this repo.
+* @adr15c0
+
+# Area owners (adjust as the team grows).
+/docs/           @adr15c0
+/.github/        @adr15c0
+/child-theme/    @adr15c0
+/mu-plugins/     @adr15c0
+/asset-pipeline/ @adr15c0
+/console/        @adr15c0

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/adr15c0/vertical-web/security/advisories/new
+    about: Report a vulnerability privately (do not open a public issue).
+  - name: Project plan
+    url: https://github.com/adr15c0/vertical-web/tree/main/docs/plan
+    about: Read the full consolidation & modernization plan.

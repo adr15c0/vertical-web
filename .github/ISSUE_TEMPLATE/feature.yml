@@ -1,0 +1,42 @@
+name: Feature / task
+description: A unit of work that delivers reviewable, reversible value.
+title: "feat: <short description>"
+labels: ["type:feature"]
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: What outcome does this deliver, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria (Definition of Done)
+      description: Concrete, checkable conditions for "done".
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies / blockers
+      description: Other issues, phases, or external prerequisites.
+    validations:
+      required: false
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Phase
+      options:
+        - "phase:0 — POC & Foundations"
+        - "phase:0.5 — Repo Governance"
+        - "phase:1 — Scaffolding & Content Model"
+        - "phase:2 — Internal Console"
+        - "phase:3 — Consolidation & Translation"
+        - "phase:4 — Azure Host & Cutover"
+    validations:
+      required: true

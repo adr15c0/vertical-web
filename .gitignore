@@ -1,0 +1,60 @@
+# --- Secrets / environment ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+*.secret
+
+# --- WordPress: core, uploads, DB, third-party plugins do NOT live in Git ---
+wp-core/
+wordpress/
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+wp-content/plugins/*
+!wp-content/plugins/.gitkeep
+*.sql
+*.sql.gz
+db-dumps/
+backups/
+
+# --- Node / console + tooling ---
+node_modules/
+dist/
+build/
+.next/
+coverage/
+*.log
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# --- PHP / Composer ---
+vendor/
+composer.phar
+
+# --- Python (asset-pipeline / scripts, if used) ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+
+# --- Local dev (DDEV) ---
+.ddev/.gitignore
+.ddev/**/*.example
+.ddev/homeadditions/
+.ddev/import-db/
+.ddev/import.yaml
+
+# --- Editors / OS ---
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.shared.json
+*.swp
+Thumbs.db

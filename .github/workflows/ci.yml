@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repo-hygiene:
+    name: Repo hygiene & docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Required files present
+        run: |
+          set -euo pipefail
+          required=(
+            README.md
+            LICENSE
+            CONTRIBUTING.md
+            SECURITY.md
+            .gitignore
+            .editorconfig
+            .github/CODEOWNERS
+            docs/plan/00-overview.md
+            docs/plan/backlog.md
+          )
+          missing=0
+          for f in "${required[@]}"; do
+            if [[ ! -f "$f" ]]; then echo "::error::missing required file: $f"; missing=1; fi
+          done
+          exit $missing
+
+      - name: Validate JSON files parse
+        run: |
+          set -euo pipefail
+          shopt -s globstar nullglob
+          fail=0
+          for f in **/*.json; do
+            if ! python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f"; then
+              echo "::error file=$f::invalid JSON"; fail=1
+            fi
+          done
+          exit $fail
+
+      - name: No obvious secrets committed
+        run: |
+          set -euo pipefail
+          if grep -RInE -- '-----BEGIN (RSA|OPENSSH|EC|PGP) PRIVATE KEY-----' \
+               --exclude-dir=.git . ; then
+            echo "::error::private key material detected"; exit 1
+          fi
+          echo "ok"
+
+  # --- Enable as code lands (path-filtered) ---
+  # php-lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: PHPCS (WordPress standards)
+  #       run: echo "TODO: run phpcs against child-theme/ and mu-plugins/"
+  #
+  # console-lint-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Lint & test console
+  #       run: echo "TODO: cd console && npm ci && npm run lint && npm test"
+  #
+  # divi-asset-schema:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Validate Divi Library JSON against schema
+  #       run: echo "TODO: validate asset-pipeline/**/*.json against schema"

@@ -141,19 +141,41 @@ issue "feat(infra): staging mirror + local->staging->prod promotion pipeline" "t
 issue "feat(infra): production cutover runbook (DNS via GoDaddy) + rehearsed rollback" "type:feature,area:infra,phase:4,risk:prod,priority:high" "Phase 4 — Azure Host, Migrate & Cutover" \
 "$(ac '- [ ] Runbook: final export, import to Azure, verify, DNS cutover, smoke tests\n- [ ] Rollback rehearsed (legacy droplet serves until DNS verified)\n- [ ] Production cutover executed')"
 
-echo "== branch protection: main =="
-gh api -X PUT "repos/$REPO/branches/main/protection" \
-  --input - >/dev/null <<'JSON' || echo "WARN: branch protection may require pushing main first"
+echo "== branch protection: main (ruleset) =="
+# NOTE: On a FREE PRIVATE repo, GitHub blocks both classic branch protection AND
+# rulesets (HTTP 403 "Upgrade to GitHub Pro or make this repository public").
+# This ruleset applies automatically once the repo is PUBLIC or on GitHub Pro/Team.
+# required_approving_review_count is 0 for a solo maintainer (enforces PR + CI +
+# linear history without needing a second reviewer); bump to 1 when a collaborator joins.
+if gh api -X POST "repos/$REPO/rulesets" --input - >/dev/null 2>&1 <<'JSON'
 {
-  "required_status_checks": { "strict": true, "contexts": ["Repo hygiene & docs"] },
-  "enforce_admins": false,
-  "required_pull_request_reviews": { "required_approving_review_count": 1, "dismiss_stale_reviews": true },
-  "restrictions": null,
-  "required_linear_history": true,
-  "allow_force_pushes": false,
-  "allow_deletions": false,
-  "required_conversation_resolution": true
+  "name": "main-protection",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
+  "rules": [
+    { "type": "deletion" },
+    { "type": "non_fast_forward" },
+    { "type": "required_linear_history" },
+    { "type": "pull_request", "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true
+    }},
+    { "type": "required_status_checks", "parameters": {
+        "strict_required_status_checks_policy": true,
+        "required_status_checks": [ { "context": "Repo hygiene & docs" } ]
+    }}
+  ]
 }
 JSON
+then
+  echo "ruleset 'main-protection' applied"
+else
+  echo "SKIPPED: branch protection needs a PUBLIC repo or GitHub Pro/Team."
+  echo "         Local stopgap: run 'git config core.hooksPath scripts/git-hooks' to block direct pushes to main."
+fi
 
 echo "Done."

@@ -32,6 +32,18 @@ Examples:
 - Issues are attached to a **Milestone** (Phase 0–4) and carry `phase:*`, `area:*`, and
   `type:*` labels.
 
+## Branch protection status
+
+Server-side protection of `main` (required PR + CI + linear history) needs a **public** repo or
+**GitHub Pro/Team** — it is not available on a free private repo. Until then, enable the local
+stopgap that blocks direct pushes to `main`:
+
+```
+git config core.hooksPath scripts/git-hooks
+```
+
+`scripts/bootstrap-github.sh` applies the real ruleset automatically once the plan/visibility allows it.
+
 ## Local expectations
 
 - Never commit WordPress core, uploads, DB dumps, third-party plugins, or secrets.

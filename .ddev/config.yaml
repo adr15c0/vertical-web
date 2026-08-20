@@ -1,0 +1,18 @@
+name: vertical-web
+type: wordpress
+docroot: wordpress
+php_version: "8.2"
+webserver_type: nginx-fpm
+database:
+  type: mysql
+  version: "8.0"
+composer_version: "2"
+corepack_enable: false
+# Local dev inner-loop for the English production replica (Phase 0).
+# Production shape mirrored: nginx + PHP 8.2 + MySQL 8.0 (Ploi droplet parity).
+# WordPress core + wp-content live under ./wordpress (git-ignored, disposable).
+# Seeded from backups/en via scripts/local/seed-local.sh.
+upload_dirs:
+  - wp-content/uploads
+web_environment:
+  - WP_ENVIRONMENT_TYPE=local

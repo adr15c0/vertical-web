@@ -19,7 +19,7 @@ jobs:
     name: Repo hygiene & docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Required files present
         run: |
@@ -66,20 +66,20 @@ jobs:
   # php-lint:
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v7
   #     - name: PHPCS (WordPress standards)
   #       run: echo "TODO: run phpcs against child-theme/ and mu-plugins/"
   #
   # console-lint-test:
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v7
   #     - name: Lint & test console
   #       run: echo "TODO: cd console && npm ci && npm run lint && npm test"
   #
   # divi-asset-schema:
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v7
   #     - name: Validate Divi Library JSON against schema
   #       run: echo "TODO: validate asset-pipeline/**/*.json against schema"

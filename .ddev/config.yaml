@@ -16,3 +16,10 @@ upload_dirs:
   - wp-content/uploads
 web_environment:
   - WP_ENVIRONMENT_TYPE=local
+  # Local tooling DB (Postgres service in docker-compose.postgres.yaml).
+  # Local dev creds only — real Azure creds live in Key Vault, never in Git.
+  - TOOLING_DB_HOST=postgres
+  - TOOLING_DB_PORT=5432
+  - TOOLING_DB_NAME=vertical_tooling
+  - TOOLING_DB_USER=tooling
+  - TOOLING_DB_PASSWORD=tooling

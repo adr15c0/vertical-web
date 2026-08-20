@@ -19,6 +19,9 @@ wp-content/plugins/*
 *.sql.gz
 db-dumps/
 backups/
+# ...but tooling-DB migrations are schema (source), not data dumps — keep them:
+!tooling-db/migrations/
+!tooling-db/migrations/*.sql
 
 # --- Node / console + tooling ---
 node_modules/

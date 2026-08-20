@@ -1,0 +1,35 @@
+# Postgres "tooling DB" running alongside DDEV WordPress.
+#
+# Reachable from the DDEV web container at host `postgres:5432`, and from the
+# macOS host at 127.0.0.1:5433 (for psql / DBeaver / the console app).
+#
+# Local dev credentials only (not secrets): vertical_tooling / tooling / tooling.
+# Schema v0 auto-applies on first init from ../tooling-db/migrations; re-apply
+# idempotently anytime with `scripts/local/tooling_db.sh migrate`.
+services:
+  postgres:
+    container_name: ddev-${DDEV_SITENAME}-postgres
+    image: postgres:16
+    restart: "no"
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    expose:
+      - "5432"
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      POSTGRES_DB: vertical_tooling
+      POSTGRES_USER: tooling
+      POSTGRES_PASSWORD: tooling
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - "../tooling-db/migrations:/docker-entrypoint-initdb.d:ro"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tooling -d vertical_tooling"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+volumes:
+  postgres_data:

@@ -61,3 +61,6 @@ venv/
 !.vscode/settings.shared.json
 *.swp
 Thumbs.db
+
+# Generated Divi asset pipeline output (regenerable)
+asset-pipeline/out/

@@ -73,15 +73,18 @@ def build_button_preset() -> tuple[str, dict[str, Any]]:
 
 
 def build_layout_shortcodes(button_preset_id: str) -> str:
-    """Hero (Global-Color background + preset button) + a 3-card feature row."""
-    gc_bg = _gc_info({GC_GREEN: ["background_color"]})
+    """Hero (brand-green background + preset button) + a 3-card feature row."""
     gc_empty = _gc_info()
 
-    # --- Hero section: background uses the brand-green Global Color ---
+    # Note: modules keep global_colors_info="{}" (the proven-safe pattern used by
+    # the site's own content). We do NOT embed a gcid->[attr] map in the shortcode:
+    # its inner `]` breaks WordPress's shortcode parser at render. The brand palette
+    # is still generated and pushed to et_global_colors so it's selectable in the VB.
+    # --- Hero section: brand-green background, hex value ---
     hero = (
         f'[et_pb_section fb_built="1" _builder_version="{BUILDER_VERSION}" '
-        f'_module_preset="default" background_color="{GC_GREEN}" '
-        f'custom_padding="120px||120px||true|false" global_colors_info="{gc_bg}"]'
+        f'_module_preset="default" background_color="{GLOBAL_COLORS[GC_GREEN]}" '
+        f'custom_padding="120px||120px||true|false" global_colors_info="{gc_empty}"]'
         f'[et_pb_row _builder_version="{BUILDER_VERSION}" _module_preset="default" '
         f'global_colors_info="{gc_empty}"]'
         f'[et_pb_column type="4_4" _builder_version="{BUILDER_VERSION}" '

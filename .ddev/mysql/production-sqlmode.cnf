@@ -1,0 +1,8 @@
+[mysqld]
+# Match the legacy production server's sql_mode (Ploi droplet, MySQL 8.0.46).
+# Source of truth: UpdraftPlus backup header from goverticalchurch.com —
+#   sql_mode=NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+# This drops STRICT_TRANS_TABLES + NO_ZERO_DATE so legacy tables that declare
+# DEFAULT '0000-00-00 00:00:00' (e.g. wp_actionscheduler_actions) import and
+# run exactly as they do in production. Faithful Phase 0 replica.
+sql_mode=NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION

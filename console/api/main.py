@@ -136,7 +136,7 @@ def wp_pages() -> list[dict[str, Any]]:
             timeout=15,
         )
         resp.raise_for_status()
-    except httpx.HTTPError as e:  # noqa: BLE001
+    except httpx.HTTPError as e:
         raise HTTPException(status_code=502, detail=f"WordPress REST error: {e}")
     return [
         {"id": p["id"], "title": p.get("title", {}).get("rendered", ""),

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<ruleset name="vertical-web">
+  <description>
+    WordPress coding standards for project PHP (Divi child theme + mu-plugins).
+    Scoped narrowly so CI only lints our code as it lands (issues #12, #15);
+    third-party plugins/themes and generated code are excluded.
+  </description>
+
+  <!-- What to scan (CI also path-filters these dirs). -->
+  <file>child-theme</file>
+  <file>mu-plugins</file>
+
+  <!-- Never scan these. -->
+  <exclude-pattern>*/vendor/*</exclude-pattern>
+  <exclude-pattern>*/node_modules/*</exclude-pattern>
+  <exclude-pattern>*/wordpress/*</exclude-pattern>
+
+  <arg name="extensions" value="php"/>
+  <arg name="colors"/>
+  <arg value="sp"/><!-- show sniff codes + progress -->
+
+  <!-- WordPress standards (installed in CI via composer). -->
+  <rule ref="WordPress-Core"/>
+  <rule ref="WordPress-Docs"/>
+
+  <!-- PHP 8.2 compatibility (matches the DDEV/prod runtime). -->
+  <config name="testVersion" value="8.2-"/>
+  <rule ref="PHPCompatibilityWP"/>
+
+  <!-- Project text domain for i18n sniffs. -->
+  <rule ref="WordPress.WP.I18n">
+    <properties>
+      <property name="text_domain" type="array" value="vertical"/>
+    </properties>
+  </rule>
+</ruleset>

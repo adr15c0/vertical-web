@@ -62,24 +62,116 @@ jobs:
           fi
           echo "ok"
 
-  # --- Enable as code lands (path-filtered) ---
-  # php-lint:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v7
-  #     - name: PHPCS (WordPress standards)
-  #       run: echo "TODO: run phpcs against child-theme/ and mu-plugins/"
-  #
-  # console-lint-test:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v7
-  #     - name: Lint & test console
-  #       run: echo "TODO: cd console && npm ci && npm run lint && npm test"
-  #
-  # divi-asset-schema:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v7
-  #     - name: Validate Divi Library JSON against schema
-  #       run: echo "TODO: validate asset-pipeline/**/*.json against schema"
+  # Detect which areas changed so the heavier jobs only run when relevant.
+  changes:
+    name: Detect changed areas
+    runs-on: ubuntu-latest
+    outputs:
+      php: ${{ steps.filter.outputs.php }}
+      console: ${{ steps.filter.outputs.console }}
+      divi: ${{ steps.filter.outputs.divi }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            php:
+              - 'child-theme/**/*.php'
+              - 'mu-plugins/**/*.php'
+              - 'phpcs.xml.dist'
+            console:
+              - 'console/**'
+            divi:
+              - 'asset-pipeline/**/*.json'
+              - 'asset-pipeline/schema/**'
+              - 'scripts/ci/validate_divi_json.py'
+
+  php-lint:
+    name: PHPCS (WordPress standards)
+    needs: changes
+    if: needs.changes.outputs.php == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Count project PHP files
+        id: php
+        run: |
+          set -euo pipefail
+          count=$(find child-theme mu-plugins -name '*.php' 2>/dev/null | wc -l | tr -d ' ')
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "PHP files to lint: $count"
+
+      - name: Set up PHP + PHPCS
+        if: steps.php.outputs.count != '0'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: cs2pr
+          coverage: none
+
+      - name: Install WordPress Coding Standards
+        if: steps.php.outputs.count != '0'
+        run: |
+          set -euo pipefail
+          composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          composer global require --no-interaction --no-progress \
+            squizlabs/php_codesniffer \
+            wp-coding-standards/wpcs \
+            phpcompatibility/phpcompatibility-wp \
+            dealerdirect/phpcodesniffer-composer-installer
+          echo "$HOME/.composer/vendor/bin" >> "$GITHUB_PATH"
+
+      - name: Run PHPCS
+        if: steps.php.outputs.count != '0'
+        run: phpcs -q --report=checkstyle | cs2pr
+
+  console-lint-test:
+    name: Console lint & build
+    needs: changes
+    if: needs.changes.outputs.console == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # --- Python BFF (console/api): lint + compile ---
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Ruff lint + compile (console/api)
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet ruff
+          ruff check console/api
+          python -m compileall -q console/api
+
+      # --- React front-end (console/web): build ---
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build (console/web)
+        working-directory: console/web
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm run build
+
+  divi-asset-schema:
+    name: Divi Library JSON schema
+    needs: changes
+    if: needs.changes.outputs.divi == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Divi exports against schema
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet jsonschema
+          python scripts/ci/validate_divi_json.py

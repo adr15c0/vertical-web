@@ -1,0 +1,7 @@
+# Ruff config for the console BFF (console/api). Pinned so CI (#3) is stable
+# across ruff versions rather than relying on shifting defaults.
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "I", "UP", "RUF"]

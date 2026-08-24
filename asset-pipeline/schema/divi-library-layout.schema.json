@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://goverticalchurch.com/schemas/divi-library-layout.schema.json",
+  "title": "Divi Library portability export",
+  "description": "Shape of a Divi Builder portability JSON (Divi Library layout / builder export) produced by the asset pipeline. Kept intentionally permissive (additionalProperties allowed) because Divi may add fields across versions; we validate the known keys' types so a malformed export fails CI early.",
+  "type": "object",
+  "required": ["context", "data"],
+  "additionalProperties": true,
+  "properties": {
+    "context": {
+      "type": "string",
+      "description": "Divi export context.",
+      "enum": ["et_builder", "et_builder_layouts", "et_pb_layout", "et_theme_builder"]
+    },
+    "data": {
+      "type": "object",
+      "description": "Map of numeric string ids -> Divi shortcode strings.",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string" }
+    },
+    "presets": {
+      "type": "object",
+      "description": "Module global presets bundled with the export."
+    },
+    "global_colors": {
+      "type": "array",
+      "description": "Global Color definitions ([gcid, {color, active}] pairs)."
+    },
+    "images": {
+      "type": "object",
+      "description": "Base64/url image payloads keyed by hash."
+    },
+    "thumbnails": {
+      "type": "array",
+      "description": "Layout thumbnail references."
+    }
+  }
+}

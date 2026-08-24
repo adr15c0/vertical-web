@@ -39,5 +39,5 @@ def query_one(sql: str, params: tuple = ()) -> dict[str, Any] | None:
 def ping() -> bool:
     try:
         return query_one("SELECT 1 AS ok;") is not None
-    except Exception:  # noqa: BLE001
+    except Exception:
         return False

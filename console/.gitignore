@@ -1,0 +1,5 @@
+# Console local dev artifacts
+api/.venv/
+api/.env
+web/node_modules/
+web/dist/

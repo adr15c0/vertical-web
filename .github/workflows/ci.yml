@@ -137,7 +137,7 @@ jobs:
 
       # --- Python BFF (console/api): lint + compile ---
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Ruff lint + compile (console/api)
@@ -167,7 +167,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Validate Divi exports against schema
